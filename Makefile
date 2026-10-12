@@ -14,28 +14,28 @@ help:
 	@echo "Individual checks: format-check lint typecheck security test"
 
 setup:
-	$(UV) sync --python $(PYTHON)
+	$(UV) sync --all-extras --python $(PYTHON)
 
 lock:
 	$(UV) lock --python $(PYTHON)
 
 format:
-	$(UV) run ruff check --fix $(SOURCES)
-	$(UV) run black $(SOURCES)
+	$(UV) run --all-extras ruff check --fix $(SOURCES)
+	$(UV) run --all-extras black $(SOURCES)
 
 format-check:
-	$(UV) run black --check $(SOURCES)
+	$(UV) run --all-extras black --check $(SOURCES)
 
 lint:
-	$(UV) run ruff check $(SOURCES)
+	$(UV) run --all-extras ruff check $(SOURCES)
 
 typecheck:
-	$(UV) run mypy
+	$(UV) run --all-extras mypy
 
 security:
-	$(UV) run bandit -c pyproject.toml -r reusable_helpers scripts examples
+	$(UV) run --all-extras bandit -c pyproject.toml -r reusable_helpers scripts examples
 
 test:
-	$(UV) run python -m unittest discover -s tests -v
+	$(UV) run --all-extras python -m unittest discover -s tests -v
 
 check: format-check lint typecheck security test

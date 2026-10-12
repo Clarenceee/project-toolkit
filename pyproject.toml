@@ -1,21 +1,40 @@
 [project]
 name = "project-toolkit"
-version = "0.1.0"
-description = "Reusable source helpers, scripts, and templates for Python projects."
+version = "0.2.0"
+description = "Reusable modules for Python projects."
 requires-python = ">=3.11,<3.13"
 dependencies = [
+    "pydantic>=2.7,<3",
+    "PyYAML>=6,<7",
+]
+
+[project.optional-dependencies]
+agents = ["pydantic-ai>=1,<2"]
+evaluation = ["openai>=2,<3"]
+mlflow = ["mlflow>=3,<4"]
+airflow = [
     "apache-airflow>=2.10,<3",
     "apache-airflow-providers-cncf-kubernetes>=8,<10",
-    "metaflow>=2.12,<3",
     "kubernetes>=28,<32",
+]
+metaflow = ["metaflow>=2.12,<3"]
+drift = [
     "numpy>=1.26,<3",
     "pandas>=2.2,<3",
     "scipy>=1.12,<2",
-    "pydantic>=2.7,<3",
+]
+migrations = [
     "SQLAlchemy>=1.4.49,<2",
     "alembic>=1.13,<2",
     "psycopg2-binary>=2.9,<3",
 ]
+
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["reusable_helpers"]
 
 [dependency-groups]
 dev = [
@@ -24,9 +43,6 @@ dev = [
     "mypy>=1.16,<2",
     "bandit[toml]>=1.8,<2",
 ]
-
-[tool.uv]
-package = false
 
 [tool.black]
 line-length = 100

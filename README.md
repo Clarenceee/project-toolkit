@@ -1,8 +1,8 @@
 # Project Toolkit
 
-Reusable helpers, scripts, and templates for data pipelines, ML workflows, database migrations, and model monitoring.
+Reusable helpers, scripts, and templates for data pipelines, ML workflows, database migrations, model monitoring, and agent applications.
 
-Designed for reuse across projects through Git submodules, with dependencies managed by uv and configuration supplied by each project.
+Designed for reuse across projects through Git submodules or installation. Optional dependency extras keep integration requirements scoped to the projects that use them; configuration is supplied by each project.
 
 ```mermaid
 flowchart TD
@@ -20,7 +20,7 @@ Add it to an existing uv project:
 
 ```bash
 git submodule add https://github.com/Clarenceee/project-toolkit.git reusable
-uv export --project reusable --no-dev --no-emit-project --no-hashes --output-file /tmp/project-toolkit-dependencies.txt
+uv export --project reusable --all-extras --no-dev --no-emit-project --no-hashes --output-file /tmp/project-toolkit-dependencies.txt
 uv add -r /tmp/project-toolkit-dependencies.txt
 PYTHONPATH="$PWD/reusable${PYTHONPATH:+:$PYTHONPATH}" uv run reusable/examples/metaflow_flow.py run
 ```
@@ -57,11 +57,39 @@ When updating the submodule, repeat the export and `uv add` commands, then commi
 For development inside this repo:
 
 ```bash
-make setup       # uv sync, including development tools
+make setup       # all optional integrations and development tools
 make format      # Ruff fixes and import sorting, then Black
 make check       # Black, Ruff, mypy, Bandit, and unit tests
 ```
 
-Dependencies live in `pyproject.toml`, with development tools in its `dev` group. uv manages the environment without installing the toolkit itself. Use `uv add <dependency>` or `uv add --dev <tool>` to update dependencies, and commit the resulting `uv.lock`. `make lock` regenerates it; override commands with `make setup PYTHON=3.12` or `make check UV=/path/to/uv`.
+Enable the repository's pre-commit checks once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+The hook runs Black in check mode, mypy, and Ruff before each commit.
+
+Install only the capabilities you use in this repository:
+
+```bash
+uv sync --extra agents --extra evaluation --extra mlflow
+```
+
+Add any workflow extras you use to that same command: `airflow`, `metaflow`, `drift`, or `migrations`.
+
+Agent building blocks live in `reusable_helpers.agents`. `BaseAgent` needs the `agents` extra; prompt loading uses PyYAML. The LLM judge accepts an injected client, and its OpenAI adapter needs `evaluation`. Import MLflow adapters from `reusable_helpers.observability` after installing the `mlflow` extra. Integrations do not create clients or read credentials at import time.
+
+The MLflow command line scripts wrap the reusable adapters. The model logger expects an importable MLflow `PythonModel` object:
+
+```bash
+python -m scripts.register_mlflow_prompt support prompts/support.txt --commit-message "Add support prompt"
+python -m scripts.log_mlflow_agent experiments/support support_agent my_package.model:python_model \
+  --code-path my_package --registered-model-name support-agent
+```
+
+Tracking configuration follows MLflow's own environment and profile settings. Prompt contents, model construction, credentials, and application policy remain owned by the consuming project.
+
+Dependencies and optional extras live in `pyproject.toml`, with development tools in its `dev` group. Use `uv add <dependency>` or `uv add --dev <tool>` to update dependencies. `make lock` regenerates `uv.lock`; override commands with `make setup PYTHON=3.12` or `make check UV=/path/to/uv`.
 
 See the [generalization playbook](GENERALIZATION_PLAYBOOK.md) when adding reusable code.

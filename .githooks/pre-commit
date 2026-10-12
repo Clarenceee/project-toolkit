@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -eu
+
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
+
+uv run --all-extras black --check reusable_helpers scripts examples tests
+uv run --all-extras mypy
+uv run --all-extras ruff check reusable_helpers scripts examples tests
