@@ -1,0 +1,53 @@
+[project]
+name = "project-toolkit"
+version = "0.1.0"
+description = "Reusable source helpers, scripts, and templates for Python projects."
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "apache-airflow>=2.10,<3",
+    "apache-airflow-providers-cncf-kubernetes>=8,<10",
+    "metaflow>=2.12,<3",
+    "kubernetes>=28,<32",
+    "numpy>=1.26,<3",
+    "pandas>=2.2,<3",
+    "scipy>=1.12,<2",
+    "pydantic>=2.7,<3",
+    "SQLAlchemy>=1.4.49,<2",
+    "alembic>=1.13,<2",
+    "psycopg2-binary>=2.9,<3",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25,<26",
+    "ruff>=0.12,<0.13",
+    "mypy>=1.16,<2",
+    "bandit[toml]>=1.8,<2",
+]
+
+[tool.uv]
+package = false
+
+[tool.black]
+line-length = 100
+target-version = ["py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["reusable_helpers", "scripts", "examples"]
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = true
+namespace_packages = true
+explicit_package_bases = true
+
+[tool.bandit]
+targets = ["reusable_helpers", "scripts", "examples"]
+exclude_dirs = ["tests", ".venv"]

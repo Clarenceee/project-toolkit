@@ -68,7 +68,7 @@ Kubernetes image and other required settings can come from env or explicit argum
 
 ## 5. Keep dependencies and imports controlled
 
-Add any new third-party dependency to the single root `requirements.txt`. Resolve the complete list before accepting the change, because every consuming project installs everything.
+Add any new third-party runtime dependency to the single root `pyproject.toml` with `uv add`. Add development tools with `uv add --dev`. Resolve the complete list and commit `uv.lock` before accepting the change, because every consuming project installs all runtime dependencies. Run `make format` and `make check` before sharing changes.
 
 Import through `reusable_helpers`, not through the originating project's `src` modules. Keep root imports lightweight. Do not introduce cycles or make `shared/` depend on integrations.
 
@@ -94,7 +94,7 @@ Choose tests appropriate to the behavior; avoid tests that only repeat implement
 
 Update the README with the capability, usage, dependencies, configuration table, and limitations. Record breaking signature changes and changed environment names.
 
-Consuming projects update intentionally: select a submodule revision, reconcile `requirements.txt` through uv, run project checks, and commit the updated submodule reference and dependency files together. Do not assume that moving the submodule automatically installs new dependencies.
+Consuming projects update intentionally: select a submodule revision, export the toolkit's runtime dependencies with `uv export --no-dev --no-emit-project --no-hashes`, add that temporary export to their project with `uv add -r`, run project checks, and commit the updated submodule reference and dependency files together. See the README for the commands. Do not assume that moving the submodule automatically installs new dependencies.
 
 ## Review checklist
 
