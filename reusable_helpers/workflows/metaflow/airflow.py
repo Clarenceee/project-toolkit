@@ -15,9 +15,13 @@ def patch_config(dag_path: Path, patches: dict) -> None:
     content = dag_path.read_text()
     for name, patch in patches.items():
         replacement = patch["replacement"]
+
+        def replace(_match: re.Match[str], replacement: str = replacement) -> str:
+            return replacement
+
         content, count = re.subn(
             patch["pattern"],
-            lambda match, replacement=replacement: replacement,
+            replace,
             content,
         )
         if count == 0 or (patch.get("unique", True) and count != 1):
@@ -110,9 +114,7 @@ def generate_dag(
         execution_timeout=resolve(
             execution_timeout, env="METAFLOW_DAG_EXECUTION_TIMEOUT", parser=int
         ),
-        startup_timeout=resolve(
-            startup_timeout, env="METAFLOW_DAG_STARTUP_TIMEOUT", parser=int
-        ),
+        startup_timeout=resolve(startup_timeout, env="METAFLOW_DAG_STARTUP_TIMEOUT", parser=int),
         tags=resolve(tags, env="METAFLOW_DAG_TAGS", parser=parse_list),
     )
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -123,9 +125,7 @@ def generate_dag(
             resolve(python, env="METAFLOW_DAG_PYTHON", default=sys.executable),
             str(flow),
         ]
-        if resolve(
-            deploy, env="METAFLOW_DAG_PRODUCTION", default=False, parser=parse_bool
-        ):
+        if resolve(deploy, env="METAFLOW_DAG_PRODUCTION", default=False, parser=parse_bool):
             cmd.append("--production")
         if resolve(retry, env="METAFLOW_DAG_RETRY", default=True, parser=parse_bool):
             cmd.extend(["--with", "retry"])

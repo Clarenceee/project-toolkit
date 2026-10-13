@@ -56,46 +56,42 @@ def get_kubernetes_pod_operator(
         env_vars=[
             k8s.V1EnvVar(
                 name=str(key),
-                value=serialize_env_value(value)
-                if is_serialize_env_value
-                else str(value),
+                value=serialize_env_value(value) if is_serialize_env_value else str(value),
             )
             for key, value in vars_.items()
         ],
-        image_pull_secrets=[
-            k8s.V1LocalObjectReference(name=name) for name in pull_secrets
-        ],
+        image_pull_secrets=[k8s.V1LocalObjectReference(name=name) for name in pull_secrets],
         image_pull_policy=resolve(
             image_pull_policy,
             env="AIRFLOW_POD_IMAGE_PULL_POLICY",
             default="IfNotPresent",
         ),
         retries=resolve(retries, env="AIRFLOW_POD_RETRIES", default=1, parser=int),
-        retry_delay=timedelta(
-            seconds=resolve(
-                env="AIRFLOW_POD_RETRY_DELAY_SECONDS", default=30, parser=float
+        retry_delay=(
+            timedelta(
+                seconds=resolve(env="AIRFLOW_POD_RETRY_DELAY_SECONDS", default=30, parser=float)
             )
-        )
-        if retry_delay is UNSET
-        else retry_delay,
-        execution_timeout=timedelta(
-            seconds=resolve(
-                env="AIRFLOW_POD_TIMEOUT_SECONDS", default=1800, parser=float
-            )
-        )
-        if execution_timeout is UNSET
-        else execution_timeout,
-        on_finish_action="delete_pod"
-        if resolve(
-            is_delete_operator_pod,
-            env="AIRFLOW_POD_DELETE_ON_FINISH",
-            default=True,
-            parser=parse_bool,
-        )
-        else "keep_pod",
-        get_logs=resolve(
-            get_logs, env="AIRFLOW_POD_GET_LOGS", default=True, parser=parse_bool
+            if retry_delay is UNSET
+            else retry_delay
         ),
+        execution_timeout=(
+            timedelta(
+                seconds=resolve(env="AIRFLOW_POD_TIMEOUT_SECONDS", default=1800, parser=float)
+            )
+            if execution_timeout is UNSET
+            else execution_timeout
+        ),
+        on_finish_action=(
+            "delete_pod"
+            if resolve(
+                is_delete_operator_pod,
+                env="AIRFLOW_POD_DELETE_ON_FINISH",
+                default=True,
+                parser=parse_bool,
+            )
+            else "keep_pod"
+        ),
+        get_logs=resolve(get_logs, env="AIRFLOW_POD_GET_LOGS", default=True, parser=parse_bool),
         in_cluster=resolve(
             in_cluster, env="AIRFLOW_POD_IN_CLUSTER", default=True, parser=parse_bool
         ),

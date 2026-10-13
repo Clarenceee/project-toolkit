@@ -1,4 +1,9 @@
-from metaflow import environment, kubernetes, step, timeout
+from metaflow import (  # type: ignore[attr-defined]
+    environment,
+    kubernetes,
+    step,
+    timeout,
+)
 
 from reusable_helpers.shared.config import (
     UNSET,
@@ -8,9 +13,7 @@ from reusable_helpers.shared.config import (
     resolve,
 )
 
-_GPU_TOLERATIONS = [
-    {"key": "nvidia.com/gpu", "operator": "Exists", "effect": "NoSchedule"}
-]
+_GPU_TOLERATIONS = [{"key": "nvidia.com/gpu", "operator": "Exists", "effect": "NoSchedule"}]
 
 
 def _parse_tolerations(value):
@@ -52,27 +55,21 @@ def kubernetes_step(
 
     remote = {}
     if run_k8:
-        raw_tolerations = resolve(
-            tolerations, env="METAFLOW_KUBERNETES_TOLERATIONS", default=[]
-        )
+        raw_tolerations = resolve(tolerations, env="METAFLOW_KUBERNETES_TOLERATIONS", default=[])
         gpu_tolerations = raw_tolerations is True or (
             isinstance(raw_tolerations, str) and raw_tolerations.lower() == "true"
         )
         tolerations = _parse_tolerations(raw_tolerations)
         remote = {
             "image": resolve(image, env="METAFLOW_KUBERNETES_IMAGE", required=True),
-            "namespace": resolve(
-                namespace, env="METAFLOW_KUBERNETES_NAMESPACE", required=True
-            ),
+            "namespace": resolve(namespace, env="METAFLOW_KUBERNETES_NAMESPACE", required=True),
             "service_account": resolve(
                 service_account,
                 env="METAFLOW_KUBERNETES_SERVICE_ACCOUNT",
                 required=True,
             ),
             "cpu": resolve(cpu, env="METAFLOW_KUBERNETES_CPU", default=1, parser=float),
-            "memory": resolve(
-                memory, env="METAFLOW_KUBERNETES_MEMORY", default=256, parser=int
-            ),
+            "memory": resolve(memory, env="METAFLOW_KUBERNETES_MEMORY", default=256, parser=int),
             "gpu": resolve(
                 gpu,
                 env="METAFLOW_KUBERNETES_GPU",

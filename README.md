@@ -68,7 +68,7 @@ Enable the repository's pre-commit checks once per clone:
 git config core.hooksPath .githooks
 ```
 
-The hook runs Black in check mode, mypy, and Ruff before each commit.
+The hook runs Black in check mode, mypy, and Ruff on staged Python files before each commit. Stage new files with `git add` to include them; it skips checks when no Python files are staged.
 
 Install only the capabilities you use in this repository:
 
@@ -77,8 +77,6 @@ uv sync --extra agents --extra evaluation --extra mlflow
 ```
 
 Add any workflow extras you use to that same command: `airflow`, `metaflow`, `drift`, or `migrations`.
-
-Agent building blocks live in `reusable_helpers.agents`. `BaseAgent` needs the `agents` extra; prompt loading uses PyYAML. The LLM judge accepts an injected client, and its OpenAI adapter needs `evaluation`. Import MLflow adapters from `reusable_helpers.observability` after installing the `mlflow` extra. Integrations do not create clients or read credentials at import time.
 
 The MLflow command line scripts wrap the reusable adapters. The model logger expects an importable MLflow `PythonModel` object:
 

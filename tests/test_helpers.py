@@ -2,6 +2,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 from reusable_helpers.shared.config import parse_bool, parse_list, resolve
@@ -36,12 +37,10 @@ class DagGenerationTests(unittest.TestCase):
             original = "CONFIG = {'dag_id': 'old', 'tags': ('old',)}\n"
             file.write_text(original)
             with self.assertRaisesRegex(ValueError, "start_date"):
-                patch_config(
-                    file, get_patch_config(dag_id="new", start_date="2026-01-01")
-                )
+                patch_config(file, get_patch_config(dag_id="new", start_date="2026-01-01"))
             self.assertEqual(file.read_text(), original)
             patch_config(file, get_patch_config(dag_id="quote'and\\backslash", tags=[]))
-            namespace = {}
+            namespace: dict[str, Any] = {}
             exec(file.read_text(), namespace)
             self.assertEqual(namespace["CONFIG"]["dag_id"], "quote'and\\backslash")
             self.assertEqual(namespace["CONFIG"]["tags"], [])
@@ -105,15 +104,11 @@ else:
 class DriftTests(unittest.TestCase):
     def setUp(self):
         self.monitor = ModelDriftMonitor(
-            DriftMonitorConfig(
-                feature_types={"value": "numerical", "category": "categorical"}
-            )
+            DriftMonitorConfig(feature_types={"value": "numerical", "category": "categorical"})
         )
 
     def test_identical_populations_are_stable(self):
-        frame = pd.DataFrame(
-            {"value": [1, 2, 3, np.nan], "category": ["a", "b", "a", None]}
-        )
+        frame = pd.DataFrame({"value": [1, 2, 3, np.nan], "category": ["a", "b", "a", None]})
         _, summary = self.monitor.calculate_psi(frame, frame)
         self.assertTrue(np.allclose(summary["psi"], 0))
         self.assertEqual(set(summary["drift_level"]), {"stable"})
@@ -123,9 +118,7 @@ class DriftTests(unittest.TestCase):
         current = pd.DataFrame({"value": [1, 2], "category": ["b", "b"]})
         bins, summary = self.monitor.calculate_psi(reference, current)
         self.assertTrue(np.isfinite(summary["psi"]).all())
-        self.assertEqual(
-            int(bins.loc[bins["bin"] == "__OTHER__", "current_count"].sum()), 2
-        )
+        self.assertEqual(int(bins.loc[bins["bin"] == "__OTHER__", "current_count"].sum()), 2)
 
     def test_empty_populations_fail_clearly(self):
         frame = pd.DataFrame({"value": [1], "category": ["a"]})
@@ -134,14 +127,10 @@ class DriftTests(unittest.TestCase):
 
     def test_shap_report_and_incompatible_shape(self):
         frame = pd.DataFrame({"value": [1, 2], "category": ["a", "b"]})
-        report = self.monitor.generate_drift_report(
-            frame, frame, lambda data: np.ones(data.shape)
-        )
+        report = self.monitor.generate_drift_report(frame, frame, lambda data: np.ones(data.shape))
         self.assertEqual(report.top_k_overlap["top_k_overlap_ratio"], 1)
         with self.assertRaisesRegex(ValueError, "single-output matrix"):
-            self.monitor.calculate_shap_importance(
-                frame, lambda data: np.ones((2, 2, 3))
-            )
+            self.monitor.calculate_shap_importance(frame, lambda data: np.ones((2, 2, 3)))
 
     def test_env_configuration_supports_overrides(self):
         with patch.dict(os.environ, {"DRIFT_MAX_NUMERICAL_BINS": "4"}):

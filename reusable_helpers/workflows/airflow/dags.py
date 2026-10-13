@@ -36,17 +36,13 @@ def get_dag(
     args = get_default_dag_args() if default_args is UNSET else default_args
     limit = dagrun_timeout
     if limit is UNSET:
-        seconds = resolve(
-            env="AIRFLOW_DAG_TIMEOUT_SECONDS", default=14400, parser=float
-        )
+        seconds = resolve(env="AIRFLOW_DAG_TIMEOUT_SECONDS", default=14400, parser=float)
         limit = timedelta(seconds=seconds) if seconds is not None else None
     return dag(
         dag_id=dag_id,
         start_date=start_date,
         schedule=resolve(schedule, env="AIRFLOW_DAG_SCHEDULE"),
-        catchup=resolve(
-            catchup, env="AIRFLOW_DAG_CATCHUP", default=False, parser=parse_bool
-        ),
+        catchup=resolve(catchup, env="AIRFLOW_DAG_CATCHUP", default=False, parser=parse_bool),
         max_active_tasks=resolve(
             concurrency, env="AIRFLOW_DAG_MAX_ACTIVE_TASKS", default=5, parser=int
         ),

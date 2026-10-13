@@ -70,7 +70,5 @@ class DriftMonitorConfig(BaseModel):
     @model_validator(mode="after")
     def validate_threshold_order(self) -> "DriftMonitorConfig":
         if self.psi_warning_threshold >= self.psi_drift_threshold:
-            raise ValueError(
-                "thresholds must satisfy psi_warning_threshold < psi_drift_threshold"
-            )
+            raise ValueError("thresholds must satisfy psi_warning_threshold < psi_drift_threshold")
         return self

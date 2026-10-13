@@ -5,6 +5,10 @@ set -eu
 repo_root=$(git rev-parse --show-toplevel)
 cd "$repo_root"
 
-uv run --all-extras black --check reusable_helpers scripts examples tests
-uv run --all-extras mypy
-uv run --all-extras ruff check reusable_helpers scripts examples tests
+if git diff --cached --quiet --diff-filter=ACMR -- '*.py'; then
+    exit 0
+fi
+
+git diff --cached --name-only --diff-filter=ACMR -z -- '*.py' | xargs -0 uv run --all-extras black --check --
+git diff --cached --name-only --diff-filter=ACMR -z -- '*.py' | xargs -0 uv run --all-extras mypy --
+git diff --cached --name-only --diff-filter=ACMR -z -- '*.py' | xargs -0 uv run --all-extras ruff check --

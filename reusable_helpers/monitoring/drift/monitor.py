@@ -78,9 +78,7 @@ class ModelDriftMonitor:
             else:
                 edges[0] = -np.inf
                 edges[-1] = np.inf
-            bin_labels = tuple(
-                f"__BIN_{index:03d}__" for index in range(len(edges) - 1)
-            )
+            bin_labels = tuple(f"__BIN_{index:03d}__" for index in range(len(edges) - 1))
             return BinSpec(
                 feature_name=feature_name,
                 feature_type="numerical",
@@ -90,9 +88,7 @@ class ModelDriftMonitor:
 
         # Create "<category>::<type>::<value>" tokens for each value
         category_tokens = tuple(
-            sorted(
-                {self._category_token(value) for value in series if not pd.isna(value)}
-            )
+            sorted({self._category_token(value) for value in series if not pd.isna(value)})
         )
         return BinSpec(
             feature_name=feature_name,
@@ -155,20 +151,14 @@ class ModelDriftMonitor:
             spec = specs[feature_name]
             reference_bins = self.assign_bins(spec, reference[feature_name])
             current_bins = self.assign_bins(spec, current_df[feature_name])
-            reference_counts = reference_bins.value_counts().reindex(
-                spec.labels, fill_value=0
-            )
-            current_counts = current_bins.value_counts().reindex(
-                spec.labels, fill_value=0
-            )
+            reference_counts = reference_bins.value_counts().reindex(spec.labels, fill_value=0)
+            current_counts = current_bins.value_counts().reindex(spec.labels, fill_value=0)
             reference_proportions = reference_counts / len(reference_bins)
             current_proportions = current_counts / len(current_bins)
             safe_reference = reference_proportions.clip(
                 lower=self.config.psi_zero_proportion_epsilon
             )
-            safe_current = current_proportions.clip(
-                lower=self.config.psi_zero_proportion_epsilon
-            )
+            safe_current = current_proportions.clip(lower=self.config.psi_zero_proportion_epsilon)
             difference = reference_proportions - current_proportions
             log_ratio = np.log(safe_reference / safe_current)
             contributions = difference * log_ratio
@@ -192,9 +182,7 @@ class ModelDriftMonitor:
                         "bin_upper": bin_upper,
                         "reference_count": reference_counts.to_numpy(dtype=int),
                         "current_count": current_counts.to_numpy(dtype=int),
-                        "proportion_reference": reference_proportions.to_numpy(
-                            dtype=float
-                        ),
+                        "proportion_reference": reference_proportions.to_numpy(dtype=float),
                         "proportion_current": current_proportions.to_numpy(dtype=float),
                         "difference": difference.to_numpy(dtype=float),
                         "log_ratio": log_ratio.to_numpy(dtype=float),
@@ -225,9 +213,7 @@ class ModelDriftMonitor:
         values = getattr(explained, "values", explained)
         return np.asarray(values)
 
-    def calculate_shap_importance(
-        self, data: pd.DataFrame, explainer: Any
-    ) -> pd.DataFrame:
+    def calculate_shap_importance(self, data: pd.DataFrame, explainer: Any) -> pd.DataFrame:
         """Calculate mean absolute SHAP importance for every configured feature."""
 
         if data.empty:
@@ -309,18 +295,14 @@ class ModelDriftMonitor:
         current_shap = self.calculate_shap_importance(current_df, explainer).rename(
             columns={"mean_abs_shap": "mean_abs_shap_current"}
         )
-        shap_features = reference_shap.merge(
-            current_shap, on="feature_name", validate="one_to_one"
-        )
+        shap_features = reference_shap.merge(current_shap, on="feature_name", validate="one_to_one")
         shap_features["reference_rank"] = (
             shap_features["mean_abs_shap_reference"]
             .rank(method="first", ascending=False)
             .astype(int)
         )
         shap_features["current_rank"] = (
-            shap_features["mean_abs_shap_current"]
-            .rank(method="first", ascending=False)
-            .astype(int)
+            shap_features["mean_abs_shap_current"].rank(method="first", ascending=False).astype(int)
         )
         shap_features = shap_features[self.SHAP_FEATURE_COLUMNS]
         correlation, p_value = self.calculate_spearman(

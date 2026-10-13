@@ -8,13 +8,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--flow", required=True)
     parser.add_argument("--output", default=UNSET)
-    parser.add_argument(
-        "--deploy", action=argparse.BooleanOptionalAction, default=UNSET
-    )
+    parser.add_argument("--deploy", action=argparse.BooleanOptionalAction, default=UNSET)
     parser.add_argument("--retry", action=argparse.BooleanOptionalAction, default=UNSET)
-    parser.add_argument(
-        "--paused", action=argparse.BooleanOptionalAction, default=UNSET
-    )
+    parser.add_argument("--paused", action=argparse.BooleanOptionalAction, default=UNSET)
     parser.add_argument("--authorize", default=UNSET)
     parser.add_argument("--python", default=UNSET)
     parser.add_argument("--dag-id", default=UNSET)

@@ -50,9 +50,7 @@ def resolve(
     """Resolve one setting without dropping explicit False, zero, or empty lists."""
     result = os.environ.get(env, default) if value is UNSET else value
     if required and (result is None or result == ""):
-        raise ValueError(
-            f"{env} is required; pass an argument or set the environment variable"
-        )
+        raise ValueError(f"{env} is required; pass an argument or set the environment variable")
     if result is None:
         return None
     try:
