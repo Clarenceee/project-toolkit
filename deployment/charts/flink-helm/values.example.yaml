@@ -1,0 +1,40 @@
+fullnameOverride: example-flink-job
+
+flinkDeploymentSpec:
+  flinkVersion: REPLACE_WITH_OPERATOR_FLINK_VERSION
+  image: example.invalid/flink-job:replace-me
+  imagePullPolicy: IfNotPresent
+  serviceAccount: replace-with-service-account
+
+  flinkConfiguration:
+    execution.checkpointing.interval: 60s
+    execution.checkpointing.mode: AT_LEAST_ONCE
+    state.checkpoints.dir: replace-with-durable-checkpoint-uri
+
+  job:
+    entryClass: org.apache.flink.client.python.PythonDriver
+    jarURI: local:///opt/flink/opt/replace-with-matching-python-jar.jar
+    args:
+      - -py
+      - /opt/flink/usrlib/service/main.py
+    parallelism: 1
+    state: running
+    upgradeMode: last-state
+
+  jobManager:
+    resource:
+      cpu: 0.5
+      memory: 2048m
+
+  taskManager:
+    resource:
+      cpu: 0.5
+      memory: 2048m
+
+  podTemplate:
+    spec:
+      containers:
+        - name: flink-main-container
+          envFrom:
+            - secretRef:
+                name: replace-with-kafka-config-secret

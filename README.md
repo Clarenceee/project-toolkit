@@ -50,6 +50,14 @@ The migration script uses the consuming project's `alembic.ini` and migration hi
 PYTHONPATH="$PWD/reusable" uv run reusable/scripts/run_migrations.py
 ```
 
+Start a PyFlink Kafka project from [the Flink template](templates/flink/README.md).
+It keeps its Flink and Python versions in the consuming project's image rather
+than adding PyFlink to this toolkit's runtime dependencies.
+
+Deploy that job with the [Flink Helm chart starter](deployment/charts/flink-helm/README.md).
+The [deployment base template](deployment/README.md) also provides ArgoCD,
+External Secrets, generic Helm, and RayService examples.
+
 Use Python 3.11 or 3.12. The Airflow helpers retain the Notion code's Airflow 2.x interface. DAG generation needs the project's configured Metaflow backend and retains the source script's dictionary-format patches, which fail explicitly if the generated structure differs. Remote workers need the submodule source included in their image or code archive and on their Python import path.
 
 When updating the submodule, repeat the export and `uv add` commands, then commit the new submodule revision together with your project's dependency changes. The exported file is temporary; `pyproject.toml` is the toolkit's dependency source.

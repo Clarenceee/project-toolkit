@@ -1,0 +1,16 @@
+nameOverride: ""
+fullnameOverride: ""
+
+# Supply the job-specific FlinkDeployment spec in a consuming project's values file.
+flinkDeploymentSpec: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  host: ""
+  path: /
+  pathType: Prefix
+  serviceName: ""
+  servicePort: 8081
+  tls: []

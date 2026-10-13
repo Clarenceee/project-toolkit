@@ -1,0 +1,5 @@
+apiVersion: v2
+name: generic-helm
+description: Starter chart for a simple stateless platform workload
+type: application
+version: 0.1.0

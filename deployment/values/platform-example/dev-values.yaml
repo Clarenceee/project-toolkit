@@ -1,0 +1,93 @@
+fullnameOverride: platform-example
+
+rayService:
+  metadata:
+    name: platform-example
+  spec:
+    serveConfigV2: |
+      applications:
+        - name: example
+          import_path: app:deployment
+          route_prefix: /
+    rayClusterConfig:
+      enableInTreeAutoscaling: true
+      rayVersion: REPLACE_WITH_RAY_VERSION
+      headGroupSpec:
+        rayStartParams:
+          dashboard-host: "0.0.0.0"
+          disable-usage-stats: "true"
+          num-cpus: "0"
+          num-gpus: "0"
+        template:
+          metadata:
+            labels:
+              platform.example.com/node-role: head
+          spec:
+            nodeSelector:
+              pool: replace-with-cpu-node-pool
+            tolerations:
+              - key: dedicated
+                operator: Equal
+                value: replace-with-taint-value
+                effect: NoSchedule
+            serviceAccountName: platform-example
+            imagePullSecrets:
+              - name: replace-with-registry-pull-secret
+            containers:
+              - name: ray-head
+                image: example.invalid/platform/ray-service:replace-me
+                imagePullPolicy: IfNotPresent
+                env:
+                  - name: RAY_LOG_TO_STDERR
+                    value: "1"
+                ports:
+                  - name: dashboard
+                    containerPort: 8265
+                  - name: serve
+                    containerPort: 8000
+                resources:
+                  requests:
+                    cpu: 250m
+                    memory: 512Mi
+                  limits:
+                    cpu: "1"
+                    memory: 2Gi
+      workerGroupSpecs:
+        - groupName: default-worker
+          minReplicas: 1
+          maxReplicas: 2
+          rayStartParams:
+            num-cpus: "1"
+            disable-usage-stats: "true"
+          template:
+            metadata:
+              labels:
+                platform.example.com/node-role: worker
+            spec:
+              nodeSelector:
+                pool: replace-with-cpu-node-pool
+              tolerations:
+                - key: dedicated
+                  operator: Equal
+                  value: replace-with-taint-value
+                  effect: NoSchedule
+              serviceAccountName: platform-example
+              imagePullSecrets:
+                - name: replace-with-registry-pull-secret
+              containers:
+                - name: ray-worker
+                  image: example.invalid/platform/ray-service:replace-me
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: RAY_LOG_TO_STDERR
+                      value: "1"
+                  ports:
+                    - name: serve
+                      containerPort: 8000
+                  resources:
+                    requests:
+                      cpu: "1"
+                      memory: 3Gi
+                    limits:
+                      cpu: "2"
+                      memory: 3Gi

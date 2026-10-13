@@ -1,0 +1,8 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: {{ include "flink-job.fullname" . }}
+  labels:
+    {{- include "flink-job.labels" . | nindent 4 }}
+spec:
+  {{- toYaml .Values.flinkDeploymentSpec | nindent 2 }}

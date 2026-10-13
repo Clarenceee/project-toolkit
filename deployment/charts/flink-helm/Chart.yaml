@@ -1,0 +1,5 @@
+apiVersion: v2
+name: flink-job
+description: Helm starter for a FlinkDeployment managed by the Flink Kubernetes Operator
+type: application
+version: 0.1.0

@@ -1,0 +1,17 @@
+fullnameOverride: ""
+
+deployment:
+  enabled: false
+  replicas: 1
+  imagePullSecrets: []
+  container:
+    name: ""
+    image: ""
+    imagePullPolicy: IfNotPresent
+    resources: {}
+    env: []
+
+serviceAccount:
+  create: false
+  name: ""
+  annotations: {}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["rayService"],
+  "properties": {
+    "rayService": {
+      "type": "object",
+      "required": ["spec"],
+      "properties": {
+        "metadata": { "type": "object" },
+        "spec": {
+          "type": "object",
+          "required": ["rayClusterConfig", "serveConfigV2"],
+          "properties": {
+            "rayClusterConfig": { "type": "object" },
+            "serveConfigV2": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  }
+}

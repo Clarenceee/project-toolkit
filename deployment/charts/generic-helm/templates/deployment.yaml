@@ -1,0 +1,38 @@
+{{- if .Values.deployment.enabled }}
+{{- $container := .Values.deployment.container -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "generic-helm.fullname" . }}
+  labels:
+    {{- include "generic-helm.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:
+      {{- include "generic-helm.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "generic-helm.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if or .Values.serviceAccount.create .Values.serviceAccount.name }}
+      serviceAccountName: {{ include "generic-helm.serviceAccountName" . }}
+      {{- end }}
+      {{- with .Values.deployment.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ required "deployment.container.name is required when deployment.enabled is true" $container.name }}
+          image: {{ required "deployment.container.image is required when deployment.enabled is true" $container.image | quote }}
+          imagePullPolicy: {{ $container.imagePullPolicy }}
+          {{- with $container.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $container.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

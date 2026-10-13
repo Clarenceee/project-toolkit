@@ -1,0 +1,3 @@
+# Add values supported by the selected External Secrets Operator chart release.
+# The empty map uses the upstream chart defaults.
+{}

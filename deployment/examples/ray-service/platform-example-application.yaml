@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-example
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://example.invalid/your-org/data-helm-charts.git
+      targetRevision: main
+      path: charts/ray-service
+      helm:
+        releaseName: platform-example
+        valueFiles:
+          - $values/values/platform-example/dev-values.yaml
+    - repoURL: https://example.invalid/your-org/data-helm-charts.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: platform
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

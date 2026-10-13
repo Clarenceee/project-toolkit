@@ -1,0 +1,18 @@
+{{- $metadata := default dict .Values.rayService.metadata -}}
+apiVersion: ray.io/v1
+kind: RayService
+metadata:
+  name: {{ default (default .Release.Name .Values.fullnameOverride) $metadata.name | trunc 63 | trimSuffix "-" }}
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    {{- with $metadata.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $metadata.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- toYaml .Values.rayService.spec | nindent 2 }}

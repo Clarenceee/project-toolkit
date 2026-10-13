@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["flinkDeploymentSpec"],
+  "properties": {
+    "flinkDeploymentSpec": {
+      "type": "object",
+      "required": ["flinkVersion", "image", "job"],
+      "properties": {
+        "flinkVersion": { "type": "string", "minLength": 1 },
+        "image": { "type": "string", "minLength": 1 },
+        "job": {
+          "type": "object",
+          "required": ["entryClass", "jarURI", "args"],
+          "properties": {
+            "entryClass": { "type": "string", "minLength": 1 },
+            "jarURI": { "type": "string", "minLength": 1 },
+            "args": { "type": "array", "minItems": 1 }
+          }
+        }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "host": { "type": "string" },
+        "servicePort": { "type": "integer", "minimum": 1, "maximum": 65535 }
+      }
+    }
+  }
+}
