@@ -1,0 +1,2 @@
+execution.checkpointing.interval: 60s
+execution.checkpointing.mode: AT_LEAST_ONCE

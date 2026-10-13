@@ -1,0 +1,2 @@
+# Add application dependencies here. PyFlink is installed by the Dockerfile
+# using the same version selected for the Flink base image.
